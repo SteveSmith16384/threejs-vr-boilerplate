@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			VR Example
+			VR Boilerplate
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
@@ -24,38 +24,28 @@
 
 			var clock = new THREE.Clock();
 
-			var container;
 			var camera, scene, raycaster, renderer;
-
-			var room, sprite2;
-
+			var room;
 			var controller, controllerGrip, tempMatrix = new THREE.Matrix4();
 			var INTERSECTED, intersectedPosition;
-
-			var groundMesh, tmpCamPos, floor;
-			
+			var loader;
+			var floor;
 			var dolly;
 			
-			var cube;
-			
-			//var stats = new Stats();
-			//document.body.appendChild(stats.dom);
-
 			init();
 			animate();
 
 			function init() {
-				container = document.createElement( 'div' );
+				var container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				//camera.position.set( 0, 1.6, 0 );
-				//scene.add( camera );
+
 				dolly = new THREE.Group();
-				dolly.position.set( 0, 0, 0 );
+				dolly.position.set( 0, 2, 0 );
 				dolly.add( camera );
 				scene.add( dolly );
 	
@@ -68,176 +58,14 @@
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
-
-				var light = new THREE.DirectionalLight( 0x00ff00, 1, 100 );
-				light.position.set( 0, 10, 0 );
-				light.target.position.set( 0,  0, 0 );
-				light.castShadow = true;
-
-				light.shadow.mapSize.width = 512;  // default
-				light.shadow.mapSize.height = 512; // default
-				light.shadow.camera.near = 0.5;    // default
-				light.shadow.camera.far = 500;     // default
-
-				scene.add( light );
-
-				var loader = new THREE.TextureLoader();
-
-
-//--------------------------
-				loader.load('textures/ericandthefloaters/ericsolidwall.png', function ( texture ) {
-					var material = new THREE.MeshBasicMaterial({map: texture});
-					var geometry = new THREE.Geometry();
-					geometry.vertices.push(
-					  new THREE.Vector3(-1, -1,  1),  // 0
-					  new THREE.Vector3( 1, -1,  1),  // 1
-					  new THREE.Vector3(-1,  1,  1),  // 2
-					  new THREE.Vector3( 1,  1,  1),  // 3
-					  new THREE.Vector3(-1, -1, -1),  // 4
-					  new THREE.Vector3( 1, -1, -1),  // 5
-					  new THREE.Vector3(-1,  1, -1),  // 6
-					  new THREE.Vector3( 1,  1, -1),  // 7
-					);
-
-					geometry.faces.push(
-					  // front
-					  new THREE.Face3(0, 3, 2),
-					  new THREE.Face3(0, 1, 3),
-					  // right
-					  new THREE.Face3(1, 7, 3),
-					  new THREE.Face3(1, 5, 7),
-					  // back
-					  new THREE.Face3(5, 6, 7),
-					  new THREE.Face3(5, 4, 6),
-					  // left
-					  new THREE.Face3(4, 2, 6),
-					  new THREE.Face3(4, 0, 2),
-					  // top
-					  new THREE.Face3(2, 7, 6),
-					  new THREE.Face3(2, 3, 7),
-					  // bottom
-					  new THREE.Face3(4, 1, 0),
-					  new THREE.Face3(4, 5, 1),
-					);
-					
-					const cube = new THREE.Mesh(geometry, material);
-					cube.position.z = -10;
-					cube.rotation.z = -10;
-					cube.rotation.x = -10;
-					scene.add(cube);
-				});
 				
-				var geometry = new THREE.BoxBufferGeometry( 0.15, 0.15, 0.15 );
+				addLight();
 
-				loader.load('textures/antattack/antattack.png', function ( texture ) {
-
-					// Stop texture being blurred
-					texture.magFilter = THREE.NearestFilter;
-					texture.minFilter = THREE.NearestFilter;
-					
-					for ( var i = 0; i < 150; i ++ ) {
-						//var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-						var material = new THREE.MeshBasicMaterial({map: texture});
-						var object = new THREE.Mesh(geometry, material);
-
-						object.castShadow = true;
-						object.receiveShadow = true;
-
-						object.position.x = Math.random() * 4 - 2;
-						object.position.y = Math.random() * 4;
-						object.position.z = Math.random() * 4 - 2;
-
-						object.rotation.x = Math.random() * 2 * Math.PI;
-						object.rotation.y = Math.random() * 2 * Math.PI;
-						object.rotation.z = Math.random() * 2 * Math.PI;
-
-						//object.scale.x = Math.random() + 0.5;
-						//object.scale.y = Math.random() + 0.5;
-						//object.scale.z = Math.random() + 0.5;
-	/*
-						object.userData.velocity = new THREE.Vector3();
-						object.userData.velocity.x = Math.random() * 0.01 - 0.005;
-						object.userData.velocity.y = Math.random() * 0.01 - 0.005;
-						object.userData.velocity.z = Math.random() * 0.01 - 0.005;
-	*/
-						
-						if (i == 0) {
-							cube = object;
-							scene.add(cube);
-						} else {
-							room.add( object );
-						}
-
-					}
-					
-					/*
-					var crateMaterial = new THREE.SpriteMaterial( { map: texture });//, useScreenCoordinates: false, color: 0xff0000 } );
-					sprite2 = new THREE.Sprite( crateMaterial );
-					sprite2.position.set( 2, 2, -2 );
-					sprite2.scale.set( 1.0, 1.0, 1.0 );
-					sprite2.castShadow = true;
-					sprite2.receiveShadow = true;
-					scene.add( sprite2 );
-
-					var sprite3 = new THREE.Sprite( crateMaterial );
-					sprite3.position.set( -2, 2, -2 );
-					sprite3.scale.set( 1.0, 1.0, 1.0 );
-					sprite2.castShadow = true;
-					sprite2.receiveShadow = true;
-					scene.add( sprite3 );
-					*/
-					
-				});
+				loader = new THREE.TextureLoader();
+				
+				addFloatingCubes();
 	
-				loader.load(
-				  'textures/antattack/antattack.png',
-				  texture => {
-						texture.wrapS = THREE.NearestFilter;
-						texture.wrapT = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-						texture.minFilter = THREE.NearestFilter;
-						//texture.offset.x = 90/(2*Math.PI);
-					var woodMaterial = new THREE.MeshPhongMaterial({
-					  map: texture//,
-					  //side: THREE.DoubleSide
-					});
-
-					groundMesh = new THREE.Mesh(
-					  new THREE.PlaneGeometry(2, 2, 32),
-					  woodMaterial
-					);
-
-					//rotate
-					//groundMesh.rotation.x = Math.PI / 2;
-					groundMesh.position.x = 4;
-					groundMesh.position.y = 2;
-					groundMesh.position.z = -2;
-					groundMesh.receiveShadow = true;
-					room.add(groundMesh);
-
-					var groundMesh2 = new THREE.Mesh(
-					  new THREE.PlaneGeometry(20, 20, 32),
-					  woodMaterial
-					);
-					groundMesh2.position.x = 0;
-					groundMesh2.position.y = 0;
-					groundMesh2.position.z = -20;
-					groundMesh2.receiveShadow = true;
-					room.add(groundMesh2);
-
-					floor = new THREE.Mesh(
-					  new THREE.PlaneGeometry(30, 30, 32),
-					  woodMaterial
-					);
-					floor.rotation.x = -Math.PI / 2;
-					floor.position.x = 0;
-					floor.position.y = -2;
-					floor.position.z = -10;
-					floor.receiveShadow = true;
-					room.add(floor);
-
-				  }
-				);
+				addFloor();
 		
 				raycaster = new THREE.Raycaster();
 
@@ -254,19 +82,11 @@
 				//
 
 				function onSelectStart() {
-					if (INTERSECTED) {
-						//INTERSECTED.position.y += 0.1;
-						if (INTERSECTED == floor) {
-							dolly.position.x = intersectedPosition.x;
-							dolly.position.z = intersectedPosition.z;
-						}
-					}
+					// Add code for when user presses their controller
 				}
 
 				function onSelectEnd() {
-					if (INTERSECTED) {
-						//INTERSECTED.position.y += 0.1;
-					}
+					// Add code for when user releases the button on their controller
 				}
 
 				controller = renderer.xr.getController( 0 );
@@ -324,6 +144,85 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 			}
+			
+			
+			function addLight() {
+				var light = new THREE.DirectionalLight( 0x00ff00, 1, 100 );
+				light.position.set( 0, 10, 0 );
+				light.target.position.set( 0,  0, 0 );
+				light.castShadow = true;
+
+				light.shadow.mapSize.width = 512;  // default
+				light.shadow.mapSize.height = 512; // default
+				light.shadow.camera.near = 0.5;    // default
+				light.shadow.camera.far = 500;     // default
+
+				scene.add( light );
+
+			}
+			
+			
+			function addFloatingCubes() {
+				var geometry = new THREE.BoxBufferGeometry( 0.15, 0.15, 0.15 );
+
+				loader.load('textures/antattack/antattack.png', function ( texture ) {
+
+					// Stop texture being blurred
+					texture.magFilter = THREE.NearestFilter;
+					texture.minFilter = THREE.NearestFilter;
+					
+					for ( var i = 0; i < 150; i ++ ) {
+						//var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+						var material = new THREE.MeshBasicMaterial({map: texture});
+						var object = new THREE.Mesh(geometry, material);
+
+						object.castShadow = true;
+						object.receiveShadow = true;
+
+						object.position.x = Math.random() * 4 - 2;
+						object.position.y = Math.random() * 4;
+						object.position.z = Math.random() * 4 - 2;
+
+						object.rotation.x = Math.random() * 2 * Math.PI;
+						object.rotation.y = Math.random() * 2 * Math.PI;
+						object.rotation.z = Math.random() * 2 * Math.PI;
+						
+						room.add( object );
+
+					}
+					
+				});
+			}
+			
+			
+			function addFloor() {
+				loader.load(
+				  'textures/antattack/antattack.png',
+				  texture => {
+						texture.wrapS = THREE.NearestFilter;
+						texture.wrapT = THREE.NearestFilter;
+						texture.magFilter = THREE.NearestFilter;
+						texture.minFilter = THREE.NearestFilter;
+						//texture.offset.x = 90/(2*Math.PI);
+					var woodMaterial = new THREE.MeshPhongMaterial({
+					  map: texture//,
+					  //side: THREE.DoubleSide
+					});
+
+					floor = new THREE.Mesh(
+					  new THREE.PlaneGeometry(30, 30, 32),
+					  woodMaterial
+					);
+					floor.rotation.x = -Math.PI / 2;
+					floor.position.x = 0;
+					floor.position.y = 0;//-2;
+					floor.position.z = -10;
+					floor.receiveShadow = true;
+					room.add(floor);
+
+				  }
+				);
+			}
 
 			//
 
@@ -333,36 +232,20 @@
 
 
 			function render() {
-				var delta = clock.getDelta();// * 60;
+				var delta = clock.getDelta();
 
-				// find intersections
+				// find what user is pointing at
 				tempMatrix.identity().extractRotation( controller.matrixWorld );
-
 				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
 				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
 				var intersects = raycaster.intersectObjects( room.children );
 
 				if ( intersects.length > 0 ) {
-						cube.position.x = intersects[ 0 ].point.x;
-						cube.position.y = intersects[ 0 ].point.y;
-						cube.position.z = intersects[ 0 ].point.z;
-
-					//if ( INTERSECTED != intersects[ 0 ].object ) {
-						INTERSECTED = intersects[ 0 ].object;
-						intersectedPosition = intersects[ 0 ].point;
-
-						//INTERSECTED.position.y += 0.01;
-					//}
-					//INTERSECTED.rotation.y += 0.01;
+					INTERSECTED = intersects[ 0 ].object;
+					intersectedPosition = intersects[ 0 ].point;
 				} else {
 					INTERSECTED = undefined;
-				}
-
-				if (groundMesh) {
-					tmpCamPos = dolly.position.clone();
-					tmpCamPos.y += 2;
-					groundMesh.lookAt(tmpCamPos);
 				}
 
 				// Test moving the camera
@@ -370,7 +253,6 @@
 				
 				renderer.render( scene, camera );
 				
-				//stats.update();
 			}
 
 		</script>
