@@ -11,4 +11,5 @@ The folder structure copies the folder structure of Three.js itself.
 
 ## How to Use
 * To move the camera and controller, change the position of the "dolly" object.
+* "intersectedObject" contains whatever object the user is pointing at.  "intersectedPosition" contains the point where the selection is occurring.
 

@@ -98,9 +98,7 @@
 				controller.addEventListener( 'disconnected', function () {
 					this.remove( this.children[ 0 ] );
 				} );
-				
 				//controller.position.y += 5;
-				
 				dolly.add( controller );
 
 				var controllerModelFactory = new XRControllerModelFactory();
@@ -114,6 +112,7 @@
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 			}
+
 
 			function buildController( data ) {
 				// Create laser pointer line
@@ -151,10 +150,10 @@
 				light.target.position.set( 0,  0, 0 );
 				light.castShadow = true;
 
-				light.shadow.mapSize.width = 512;  // default
-				light.shadow.mapSize.height = 512; // default
-				light.shadow.camera.near = 0.5;    // default
-				light.shadow.camera.far = 500;     // default
+				//light.shadow.mapSize.width = 512;  // default
+				//light.shadow.mapSize.height = 512; // default
+				//light.shadow.camera.near = 0.5;    // default
+				//light.shadow.camera.far = 500;     // default
 
 				scene.add( light );
 			}
@@ -193,32 +192,31 @@
 			
 			function addFloor() {
 				loader.load(
-				  'textures/antattack/antattack.png',
-				  texture => {
+					'textures/antattack/antattack.png',
+					texture => {
 						texture.wrapS = THREE.NearestFilter;
 						texture.wrapT = THREE.NearestFilter;
 						texture.magFilter = THREE.NearestFilter;
 						texture.minFilter = THREE.NearestFilter;
-					var woodMaterial = new THREE.MeshPhongMaterial({
-					  map: texture
-				  });
+						var woodMaterial = new THREE.MeshPhongMaterial({
+						map: texture
+						});
 
-					floor = new THREE.Mesh(
-					  new THREE.PlaneGeometry(30, 30, 32),
-					  woodMaterial
-					);
-					floor.rotation.x = -Math.PI / 2;
-					floor.position.x = 0;
-					floor.position.y = 0;//-2;
-					floor.position.z = -10;
-					floor.receiveShadow = true;
-					room.add(floor);
+						floor = new THREE.Mesh(
+						  new THREE.PlaneGeometry(30, 30, 32),
+						  woodMaterial
+						);
+						floor.rotation.x = -Math.PI / 2;
+						floor.position.x = 0;
+						floor.position.y = 0;
+						floor.position.z = -10;
+						floor.receiveShadow = true;
+						room.add(floor);
 
-				  }
+					}
 				);
 			}
 
-			//
 
 			function animate() {
 				renderer.setAnimationLoop( render );
@@ -236,8 +234,8 @@
 				var intersects = raycaster.intersectObjects( room.children );
 
 				if ( intersects.length > 0 ) {
-					intersectedObject = intersects[ 0 ].object;
-					intersectedPosition = intersects[ 0 ].point;
+					intersectedObject = intersects[0].object;
+					intersectedPosition = intersects[0].point;
 				} else {
 					intersectedObject = undefined;
 				}
