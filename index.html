@@ -25,12 +25,13 @@
 			var clock = new THREE.Clock();
 
 			var camera, scene, raycaster, renderer;
-			var room;
+			var room; // Contains the main objects in the scene.
 			var controller, controllerGrip, tempMatrix = new THREE.Matrix4();
-			var INTERSECTED, intersectedPosition;
-			var loader;
+			var intersectedObject, intersectedPosition; // Contains the object and intersected position of where the user is pointing.
+			var loader; // Texture loader
 			var floor;
-			var dolly;
+			
+			var dolly; // The dolly contains the camera and the controller.  Move the dolly to move the camera and ontroller.
 			
 			init();
 			animate();
@@ -57,14 +58,12 @@
 				room.receiveShadow = true;
 				scene.add( room );
 
-				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
-				
-				addLight();
+				addLights();
 
 				loader = new THREE.TextureLoader();
 				
-				addFloatingCubes();
-	
+				// Add some dummy objects to view
+				addFloatingCubes();	
 				addFloor();
 		
 				raycaster = new THREE.Raycaster();
@@ -100,7 +99,7 @@
 					this.remove( this.children[ 0 ] );
 				} );
 				
-				controller.position.y += 5;
+				//controller.position.y += 5;
 				
 				dolly.add( controller );
 
@@ -111,8 +110,6 @@
 				dolly.add( controllerGrip );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				//
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
@@ -146,7 +143,9 @@
 			}
 			
 			
-			function addLight() {
+			function addLights() {
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+				
 				var light = new THREE.DirectionalLight( 0x00ff00, 1, 100 );
 				light.position.set( 0, 10, 0 );
 				light.target.position.set( 0,  0, 0 );
@@ -158,7 +157,6 @@
 				light.shadow.camera.far = 500;     // default
 
 				scene.add( light );
-
 			}
 			
 			
@@ -170,10 +168,10 @@
 					// Stop texture being blurred
 					texture.magFilter = THREE.NearestFilter;
 					texture.minFilter = THREE.NearestFilter;
+
+					var material = new THREE.MeshBasicMaterial({map: texture});
 					
-					for ( var i = 0; i < 150; i ++ ) {
-						//var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-						var material = new THREE.MeshBasicMaterial({map: texture});
+					for ( var i = 0; i < 50; i ++ ) {
 						var object = new THREE.Mesh(geometry, material);
 
 						object.castShadow = true;
@@ -188,9 +186,7 @@
 						object.rotation.z = Math.random() * 2 * Math.PI;
 						
 						room.add( object );
-
 					}
-					
 				});
 			}
 			
@@ -203,11 +199,9 @@
 						texture.wrapT = THREE.NearestFilter;
 						texture.magFilter = THREE.NearestFilter;
 						texture.minFilter = THREE.NearestFilter;
-						//texture.offset.x = 90/(2*Math.PI);
 					var woodMaterial = new THREE.MeshPhongMaterial({
-					  map: texture//,
-					  //side: THREE.DoubleSide
-					});
+					  map: texture
+				  });
 
 					floor = new THREE.Mesh(
 					  new THREE.PlaneGeometry(30, 30, 32),
@@ -242,10 +236,10 @@
 				var intersects = raycaster.intersectObjects( room.children );
 
 				if ( intersects.length > 0 ) {
-					INTERSECTED = intersects[ 0 ].object;
+					intersectedObject = intersects[ 0 ].object;
 					intersectedPosition = intersects[ 0 ].point;
 				} else {
-					INTERSECTED = undefined;
+					intersectedObject = undefined;
 				}
 
 				// Test moving the camera
@@ -258,4 +252,3 @@
 		</script>
 	</body>
 </html>
-=
