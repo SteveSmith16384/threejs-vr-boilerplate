@@ -187,8 +187,17 @@
 					texture.magFilter = THREE.NearestFilter;
 					texture.minFilter = THREE.NearestFilter;
 
-					var material = new THREE.MeshBasicMaterial({map: texture});
+					// Basic material
+					//var material = new THREE.MeshBasicMaterial({map: texture});
 					
+					// Light aware material
+					var material = new THREE.MeshLambertMaterial ({
+						map: texture,    
+						//envMap: scene.background,      
+						combine: THREE.MixOperation,     
+						reflectivity: .5     
+					})					
+
 					for ( var i = 0; i < 50; i ++ ) {
 						var object = new THREE.Mesh(geometry, material);
 
@@ -218,7 +227,7 @@
 						texture.magFilter = THREE.NearestFilter;
 						texture.minFilter = THREE.NearestFilter;
 						var woodMaterial = new THREE.MeshPhongMaterial({
-						map: texture
+							map: texture
 						});
 
 						floor = new THREE.Mesh(
