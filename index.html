@@ -193,10 +193,9 @@
 					// Light aware material
 					var material = new THREE.MeshLambertMaterial ({
 						map: texture,    
-						//envMap: scene.background,      
 						combine: THREE.MixOperation,     
 						reflectivity: .5     
-					})					
+					});
 
 					for ( var i = 0; i < 50; i ++ ) {
 						var object = new THREE.Mesh(geometry, material);
